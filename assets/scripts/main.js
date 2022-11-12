@@ -47,11 +47,10 @@ function initializeServiceWorker() {
   // B1. TODO - Check if 'serviceWorker' is supported in the current browser
   if('serviceWorker' in navigator) {
     window.addEventListener('load', ()=> {
-      navigator.serviceWorker.register('./sw.js').then((register)=> {
+      navigator.serviceWorker.register('../sw.js').then((register)=> {
         console.log('Successfully registered');
-      },
-      (err)=> {
-        console.error(`Registration failed: ${err}`);
+      }).catch((err) => {
+        console.log(`Failed to register sw: ${err}`);
       });
     });
   }

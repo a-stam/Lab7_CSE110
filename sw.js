@@ -39,28 +39,27 @@ self.addEventListener('fetch', function (event) {
   /*******************************/
   // B7. TODO - Respond to the event by opening the cache using the name we gave
   //            above (CACHE_NAME)
-  caches.open(CACHE_NAME).then((cache)=> {
-    /*return cache.match(event.request).then((cacheResp)=> {
-      return cacheResp || fetch(event.request).then((fetchedResp)=> {
-        cache.put(event.request, fetchedResp.clone());
-        return fetchedResp;
-     }) */
-     return cache.match(event.request).then((cachedResponse) => {
+  event.respondWith(caches.open(CACHE_NAME).then((cache) => {
+    // Respond with the image from the cache or from the network
+    return cache.match(event.request).then((cachedResponse) => {
       return cachedResponse || fetch(event.request).then((fetchedResponse) => {
+        // Add the network response to the cache for future visits.
+        // Note: we need to make a copy of the response to save it in
+        // the cache and use the original as the request response.
         cache.put(event.request, fetchedResponse.clone());
+
+        // Return the network response
         return fetchedResponse;
       });
     });
-     /*if(cacheResp === undefined) {
-        fetch(event.request).then((fetchResp)=> {
-          cache.put(event.request, fetchResp.clone());
-          return fetchedResponse; 
-        })
-      }
-      else {
-        return cacheResp;
-      } */
-  });
+  }));
+  /*
+ event.respondWith(fetch(event.request).then(res => {
+    const resClone = res.clone();
+    caches.open(CACHE_NAME).then(cache => {cache.put(event.request, resClone);});
+    return res;
+  })).catch(err => caches.match(event.request).then(res =>res));
+*/
   // B8. TODO - If the request is in the cache, return with the cached version.
   //            Otherwise fetch the resource, add it to the cache, and return
   //            network response.
